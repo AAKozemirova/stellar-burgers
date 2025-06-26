@@ -9,6 +9,7 @@
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "format": "prettier --write src/**/*.{ts,tsx}",
     "cy:open": "cypress open",
+    "cy:run": "cypress run",
     "preview": "vite preview --base=/stellar-burgers/",
     "predeploy": "npm run build",
     "deploy": "gh-pages -d dist"
