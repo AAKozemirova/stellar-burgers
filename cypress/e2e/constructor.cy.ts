@@ -122,4 +122,17 @@ describe('E2E тестирование конструктора бургера',
       cy.contains('Оформить заказ').should('be.disabled');
     });
   });
+
+  describe('Тестирование для неавторизованного пользователя', () => {
+    it('Проверка невозможности оформить заказ для неавторизованного пользователя', () => {
+      cy.get(selectors.ingredient_bun).drag(selectors.constructor_container);
+      cy.get(selectors.constructor_ingredient_bun).should('be.visible');
+      cy.get(selectors.ingredient_main).drag(selectors.constructor_container);
+      cy.get(selectors.constructor_ingredient_main).should('be.visible');
+      cy.get(selectors.ingredient_sauce).drag(selectors.constructor_container);
+      cy.get(selectors.constructor_ingredient_sauce).should('be.visible');
+      cy.get('button').contains(selectors.order_button).click();
+      cy.get('p').contains(selectors.login_page_text).should('be.visible');
+    });
+  });
 });
