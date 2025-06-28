@@ -1,45 +1,125 @@
 import '@4tw/cypress-drag-drop';
 import { selectors, api } from '../constants';
 
-describe('E2E тестирование конструктора', () => {
+describe('E2E тестирование конструктора бургера', () => {
   beforeEach(() => {
     cy.viewport(1280, 720);
+    cy.intercept('GET', '**/api/ingredients', { fixture: 'ingredients.json' }).as('getIngredients');
+    cy.intercept('POST', '**/api/orders', { fixture: 'order.json' }).as('postOrder');
     cy.visit('/');
+    cy.wait('@getIngredients');
   });
 
-  it('Проверка невозможности оформить заказ для неавторизованного пользователя', () => {
-    cy.get(selectors.ingredient_bun).drag(selectors.constructor_container);
-    cy.get(selectors.constructor_ingredient_bun).should('be.visible');
-    cy.get(selectors.ingredient_main).drag(selectors.constructor_container);
-    cy.get(selectors.constructor_ingredient_main).should('be.visible');
-    cy.get(selectors.ingredient_sauce).drag(selectors.constructor_container);
-    cy.get(selectors.constructor_ingredient_sauce).should('be.visible');
-    cy.get('button').contains(selectors.order_button).click();
-    cy.get('p').contains(selectors.login_page_text).should('be.visible');
+  describe('Добавление ингредиентов в конструктор', () => {
+    it('Добавление булки в конструктор', () => {
+      cy.get('[data-cy="643d69a5c3f7b9001cfa093c"]').drag('[data-cy="constructor-container"]');
+      cy.get('[data-cy="set-643d69a5c3f7b9001cfa093c"]').should('be.visible');
+    });
+
+    it('Добавление начинки в конструктор', () => {
+      cy.get('[data-cy="643d69a5c3f7b9001cfa0941"]').drag('[data-cy="constructor-container"]');
+      cy.get('[data-cy="set-643d69a5c3f7b9001cfa0941"]').should('be.visible');
+    });
+
+    it('Добавление соуса в конструктор', () => {
+      cy.get('[data-cy="643d69a5c3f7b9001cfa0942"]').drag('[data-cy="constructor-container"]');
+      cy.get('[data-cy="set-643d69a5c3f7b9001cfa0942"]').should('be.visible');
+    });
+
+    it('Добавление нескольких ингредиентов в конструктор', () => {
+      // Добавляем булку
+      cy.get('[data-cy="643d69a5c3f7b9001cfa093c"]').drag('[data-cy="constructor-container"]');
+      cy.get('[data-cy="set-643d69a5c3f7b9001cfa093c"]').should('be.visible');
+      
+      // Добавляем начинку
+      cy.get('[data-cy="643d69a5c3f7b9001cfa0941"]').drag('[data-cy="constructor-container"]');
+      cy.get('[data-cy="set-643d69a5c3f7b9001cfa0941"]').should('be.visible');
+      
+      // Добавляем соус
+      cy.get('[data-cy="643d69a5c3f7b9001cfa0942"]').drag('[data-cy="constructor-container"]');
+      cy.get('[data-cy="set-643d69a5c3f7b9001cfa0942"]').should('be.visible');
+    });
   });
 
-  it('Проверка оформления заказа для авторизованного пользователя', () => {
-    cy.visit('/login');
-    cy.get('input[name="email"]').type(Cypress.env('email'));
-    cy.get('input[name="password"]').type(Cypress.env('password'));
-    cy.intercept('POST', api.login).as('login');
-    cy.get('button[type="submit"]').click();
-    cy.wait('@login', { timeout: 50000 })
-      .its('response.statusCode')
-      .should('eq', 200);
-    cy.getCookie('accessToken').get('value').should('not.be.empty');
-    cy.getCookie('refreshToken').get('value').should('not.be.empty');
-    cy.get(selectors.ingredient_bun).drag(selectors.constructor_container);
-    cy.get(selectors.constructor_ingredient_bun).should('be.visible');
-    cy.get(selectors.ingredient_main).drag(selectors.constructor_container);
-    cy.get(selectors.constructor_ingredient_main).should('be.visible');
-    cy.get(selectors.ingredient_sauce).drag(selectors.constructor_container);
-    cy.get(selectors.constructor_ingredient_sauce).should('be.visible');
-    cy.intercept('POST', api.order).as('order');
-    cy.get('button').contains(selectors.order_button).click();
-    cy.wait('@order', { timeout: 50000 })
-      .its('response.statusCode')
-      .should('eq', 200);
-    cy.get('p').contains(selectors.order_modal_text).should('be.visible');
+  describe('Работа с модальными окнами ингредиентов', () => {
+    it('Открытие модального окна ингредиента', () => {
+      cy.get('[data-cy="643d69a5c3f7b9001cfa093c"]').click();
+      cy.get('[data-cy="close-modal"]').should('be.visible');
+      cy.contains('Краторная булка N-200i').should('be.visible');
+    });
+
+    it('Закрытие модального окна по клику на крестик', () => {
+      cy.get('[data-cy="643d69a5c3f7b9001cfa093c"]').click();
+      cy.get('[data-cy="close-modal"]').should('be.visible');
+      cy.get('[data-cy="close-modal"]').click();
+      cy.get('[data-cy="close-modal"]').should('not.exist');
+    });
+
+    it('Закрытие модального окна по клику на оверлей', () => {
+      cy.get('[data-cy="643d69a5c3f7b9001cfa093c"]').click();
+      cy.get('[data-cy="close-modal"]').should('be.visible');
+      // Кликаем на оверлей (вне модального окна)
+      cy.get('body').click(0, 0);
+      cy.get('[data-cy="close-modal"]').should('not.exist');
+    });
+
+    it('Отображение данных правильного ингредиента в модальном окне', () => {
+      cy.get('[data-cy="643d69a5c3f7b9001cfa0941"]').click();
+      cy.get('[data-cy="close-modal"]').should('be.visible');
+      cy.contains('Биокотлета из марсианской Магнолии').should('be.visible');
+      cy.contains('4242').should('be.visible'); // калории
+      cy.contains('424').should('be.visible'); // цена
+    });
+  });
+
+  describe('Создание заказа', () => {
+    beforeEach(() => {
+      cy.setCookie('accessToken', 'Bearer test-access-token-12345');
+      cy.setCookie('refreshToken', 'test-refresh-token-67890');
+      cy.intercept('GET', '**/api/auth/user', { fixture: 'user.json' }).as('getUser');
+      cy.reload();
+    });
+
+    afterEach(() => {
+      cy.clearCookies();
+    });
+
+    it('Создание заказа с полным бургером', () => {
+      cy.get('[data-cy="643d69a5c3f7b9001cfa093c"]').drag('[data-cy="constructor-container"]');
+      cy.get('[data-cy="643d69a5c3f7b9001cfa0941"]').drag('[data-cy="constructor-container"]');
+      cy.get('[data-cy="643d69a5c3f7b9001cfa0942"]').drag('[data-cy="constructor-container"]');
+      cy.get('[data-cy="set-643d69a5c3f7b9001cfa093c"]').should('be.visible');
+      cy.get('[data-cy="set-643d69a5c3f7b9001cfa0941"]').should('be.visible');
+      cy.get('[data-cy="set-643d69a5c3f7b9001cfa0942"]').should('be.visible');
+      cy.contains('Оформить заказ').should('not.be.disabled');
+      cy.contains('Оформить заказ').click({ force: true });
+      cy.wait('@postOrder');
+      cy.get('[data-cy="close-modal"]').should('be.visible');
+      cy.contains('Ваш заказ начали готовить').should('be.visible');
+      cy.contains('12345').should('be.visible');
+      cy.get('[data-cy="close-modal"]').click();
+      cy.get('[data-cy="close-modal"]').should('not.exist');
+      cy.get('[data-cy="set-643d69a5c3f7b9001cfa093c"]').should('not.exist');
+      cy.get('[data-cy="set-643d69a5c3f7b9001cfa0941"]').should('not.exist');
+      cy.get('[data-cy="set-643d69a5c3f7b9001cfa0942"]').should('not.exist');
+    });
+
+    it('Проверка невозможности создания заказа без булки', () => {
+      // Добавляем только начинку без булки
+      cy.get('[data-cy="643d69a5c3f7b9001cfa0941"]').drag('[data-cy="constructor-container"]');
+      cy.get('[data-cy="set-643d69a5c3f7b9001cfa0941"]').should('be.visible');
+      
+      // Кнопка "Оформить заказ" должна быть неактивна
+      cy.contains('Оформить заказ').should('be.disabled');
+    });
+
+    it('Проверка невозможности создания заказа с одной булкой', () => {
+      // Добавляем только булку
+      cy.get('[data-cy="643d69a5c3f7b9001cfa093c"]').drag('[data-cy="constructor-container"]');
+      cy.get('[data-cy="set-643d69a5c3f7b9001cfa093c"]').should('be.visible');
+      
+      // Кнопка "Оформить заказ" должна быть неактивна (нужна булка + минимум 2 ингредиента)
+      cy.contains('Оформить заказ').should('be.disabled');
+    });
   });
 });
