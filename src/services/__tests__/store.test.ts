@@ -46,4 +46,41 @@ describe('Redux Store', () => {
     
     expect(state.baseApi).toBeDefined();
   });
+
+  it('should return correct initial state for unknown action', () => {
+    const unknownAction = { type: 'UNKNOWN_ACTION' };
+    
+    // Диспатчим неизвестный экшен
+    store.dispatch(unknownAction);
+    const newState = store.getState();
+    
+    // Проверяем, что основные части состояния остались корректными
+    expect(newState.constructorContent.ingredients).toEqual([]);
+    expect(newState.constructorContent.bun).toBeNull();
+    expect(newState.authState.isAuthenticated).toBe(false);
+    expect(newState.authState.isForgotPassword).toBe(false);
+  });
+
+  it('should handle undefined state correctly', () => {
+    // Тестируем каждый редьюсер с undefined состоянием
+    const unknownAction = { type: 'UNKNOWN_ACTION' };
+    
+    // Constructor slice
+    const constructorState = constructorSlice.reducer(undefined, unknownAction);
+    expect(constructorState).toEqual({
+      ingredients: [],
+      bun: null,
+    });
+    
+    // Auth slice
+    const authState = authSlice.reducer(undefined, unknownAction);
+    expect(authState).toEqual({
+      isAuthenticated: false,
+      isForgotPassword: false,
+    });
+    
+    // BaseApi slice
+    const apiState = baseApi.reducer(undefined, unknownAction);
+    expect(apiState).toBeDefined();
+  });
 }); 
