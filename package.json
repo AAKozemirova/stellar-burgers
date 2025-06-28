@@ -10,6 +10,9 @@
     "format": "prettier --write src/**/*.{ts,tsx}",
     "cy:open": "cypress open",
     "cy:run": "cypress run",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage",
     "preview": "vite preview --base=/stellar-burgers/",
     "predeploy": "npm run build",
     "deploy": "gh-pages -d dist"
@@ -34,6 +37,10 @@
   "devDependencies": {
     "@4tw/cypress-drag-drop": "^2.2.4",
     "@feature-sliced/eslint-config": "^0.1.0-beta.6",
+    "@testing-library/jest-dom": "^6.6.3",
+    "@testing-library/react": "^16.3.0",
+    "@testing-library/user-event": "^14.6.1",
+    "@types/jest": "^30.0.0",
     "@types/js-cookie": "^3.0.3",
     "@types/node": "^20.4.5",
     "@types/react": "^18.2.15",
@@ -56,9 +63,12 @@
     "eslint-plugin-react-hooks": "^4.6.0",
     "eslint-plugin-react-refresh": "^0.4.3",
     "gh-pages": "^6.0.0",
+    "jest": "^30.0.3",
+    "jest-environment-jsdom": "^30.0.2",
     "postcss": "^8.4.27",
     "prettier": "^3.0.0",
     "tailwindcss": "^3.3.3",
+    "ts-jest": "^29.4.0",
     "typescript": "^5.0.2",
     "vite": "^4.4.5"
   },
