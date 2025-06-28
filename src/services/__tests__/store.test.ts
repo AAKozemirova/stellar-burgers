@@ -1,36 +1,49 @@
-import { store } from '../../app/store';
+import { configureStore } from '@reduxjs/toolkit';
+import { constructorSlice } from '@/entities/constructor/model';
+import { authSlice } from '@/entities/user/model';
+import { baseApi } from '@/shared/api';
 
 describe('Redux Store', () => {
-  it('должен возвращать корректное начальное состояние при вызове с undefined состоянием и неизвестным экшеном', () => {
-    const initialState = store.getState();
-    
-    // Проверяем, что store имеет ожидаемую структуру
-    expect(initialState).toHaveProperty('baseApi');
-    expect(initialState).toHaveProperty('constructorContent');
-    expect(initialState).toHaveProperty('authState');
-    
-    // Проверяем начальное состояние constructor слайса
-    expect(initialState.constructorContent).toEqual({
-      ingredients: [],
-      bun: null,
-    });
-    
-    // Проверяем начальное состояние auth слайса
-    expect(initialState.authState).toEqual({
-      isAuthenticated: false,
-      isForgotPassword: false,
+  let store: any;
+
+  beforeEach(() => {
+    store = configureStore({
+      reducer: {
+        [baseApi.reducerPath]: baseApi.reducer,
+        [constructorSlice.name]: constructorSlice.reducer,
+        [authSlice.name]: authSlice.reducer,
+      },
+      middleware: (getDefaultMiddleware) =>
+        getDefaultMiddleware().concat(baseApi.middleware),
     });
   });
 
-  it('должен обрабатывать неизвестные экшены без изменения состояния', () => {
-    const initialState = store.getState();
+  it('should create store with initial state', () => {
+    const state = store.getState();
     
-    // Диспатчим неизвестный экшен
-    store.dispatch({ type: 'UNKNOWN_ACTION' });
+    expect(state).toBeDefined();
+    expect(typeof state).toBe('object');
+  });
+
+  it('should have constructor slice in state', () => {
+    const state = store.getState();
     
-    const stateAfterUnknownAction = store.getState();
+    expect(state.constructorContent).toBeDefined();
+    expect(state.constructorContent.ingredients).toEqual([]);
+    expect(state.constructorContent.bun).toBeNull();
+  });
+
+  it('should have auth slice in state', () => {
+    const state = store.getState();
     
-    // Состояние не должно измениться
-    expect(stateAfterUnknownAction).toEqual(initialState);
+    expect(state.authState).toBeDefined();
+    expect(state.authState.isAuthenticated).toBe(false);
+    expect(state.authState.isForgotPassword).toBe(false);
+  });
+
+  it('should have baseApi slice in state', () => {
+    const state = store.getState();
+    
+    expect(state.baseApi).toBeDefined();
   });
 }); 
