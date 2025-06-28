@@ -11,7 +11,7 @@ export const store = configureStore({
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware().concat(baseApi.middleware),
-  devTools: import.meta.env.VITE_DEV_MODE !== 'production',
+  devTools: true,
 });
 
 export type RootState = ReturnType<typeof store.getState>;
