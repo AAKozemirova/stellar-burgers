@@ -14,6 +14,9 @@ export const selectors = {
   order_button: constantsMap.features.order.orderButton,
   login_page_text: constantsMap.pages.login.mainText,
   order_modal_text: constantsMap.entities.order.modal.mainText,
+  tab_bun: constantsMap.entities.ingredient.types.bun,
+  tab_main: constantsMap.entities.ingredient.types.main,
+  tab_sauce: constantsMap.entities.ingredient.types.sauce,
 };
 
 export const api = {
