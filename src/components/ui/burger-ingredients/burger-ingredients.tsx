@@ -4,6 +4,7 @@ import { Tab } from '@zlden/react-developer-burger-ui-components';
 import styles from './burger-ingredients.module.css';
 import { BurgerIngredientsUIProps } from './type';
 import { IngredientsCategory } from '@components';
+import { constantsMap } from '../../../shared/model/constants';
 
 export const BurgerIngredientsUI: FC<BurgerIngredientsUIProps> = memo(
   ({
@@ -23,23 +24,21 @@ export const BurgerIngredientsUI: FC<BurgerIngredientsUIProps> = memo(
       <section className={styles.burger_ingredients}>
         <nav>
           <ul className={styles.menu}>
-            <Tab value='bun' active={currentTab === 'bun'} onClick={onTabClick}>
-              Булки
-            </Tab>
-            <Tab
-              value='main'
-              active={currentTab === 'main'}
-              onClick={onTabClick}
-            >
-              Начинки
-            </Tab>
-            <Tab
-              value='sauce'
-              active={currentTab === 'sauce'}
-              onClick={onTabClick}
-            >
-              Соусы
-            </Tab>
+            <li>
+              <Tab value='bun' active={currentTab === 'bun'} onClick={onTabClick}>
+                {constantsMap.entities.ingredient.types.bun}
+              </Tab>
+            </li>
+            <li>
+              <Tab value='main' active={currentTab === 'main'} onClick={onTabClick}>
+                {constantsMap.entities.ingredient.types.main}
+              </Tab>
+            </li>
+            <li>
+              <Tab value='sauce' active={currentTab === 'sauce'} onClick={onTabClick}>
+                {constantsMap.entities.ingredient.types.sauce}
+              </Tab>
+            </li>
           </ul>
         </nav>
         <div className={styles.content}>
